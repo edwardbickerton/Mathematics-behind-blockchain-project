@@ -19,7 +19,9 @@ def random_transaction():
         randint(1, 10))
 
 
-def random_transactions(number: int = 6):
+def random_transactions(number: int = None):
+    if number is None:
+        number = randint(7,11)
     return (['Coinbase Transaction: 6.25 BTC to {}'.format(
         names[randint(0, len(names)-1)])]
             + [random_transaction() for i in range(number-1)])
@@ -48,7 +50,7 @@ def Verify(tree, string):
 
 def main():
     global transactions, tree
-    transactions = random_transactions(11)
+    transactions = random_transactions()
     print('transactions:')
     print(transactions)
     tree = Merkle_Tree(transactions)
