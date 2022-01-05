@@ -173,6 +173,7 @@ class Merkle_Tree:
 
 class Hashcash_Message:
     default_difficulty = 5
+    hash_function = Hashing.my_hash_hex
 
     def format_hashcash_message(hashcash_message):
         return ('Recipient: ' + hashcash_message.recipient
@@ -189,11 +190,11 @@ class Hashcash_Message:
         self.recipient = recipient
         if verbose:
             num_attempts_msg = (
-                'It took {0} attempts to find a valid nonce:\n')
+                'It took {0} attempts to find a valid nonce.')
         attempts = 0
         while True:
             self.nonce = SystemRandom().getrandbits(256)
-            trial_hash = Hashing.my_hash(
+            trial_hash = Hashcash_Message.hash_function(
                 Hashcash_Message.format_hashcash_message(self))
             if trial_hash[:difficulty] == ''.join(
                     ['0' for i in range(difficulty)]):
@@ -211,9 +212,10 @@ class Hashcash_Message:
             message: str,
             verbose: bool = True) -> str:
         difficulty = 0
-        hash_to_verify = Hashing.my_hash('Recipient: ' + recipient
-                                         + '\nNonce: ' + str(nonce)
-                                         + '\nMessage:\n' + message)
+        hash_to_verify = Hashcash_Message.hash_function(
+            'Recipient: ' + recipient +
+            '\nNonce: ' + str(nonce) +
+            '\nMessage:\n' + message)
         if verbose:
             no_work_msg = (
                 'WARNING: No work done. This could be spam. The hash is:\n{}')
@@ -331,7 +333,7 @@ class Hashcash_Message:
 def main():
     print()
     Hashing.test_hash_function(
-        Hashing.my_hash,
+        Hashing.my_hash_hex,
         correct_length=len(str(2**256-1)))
     Hashcash_Message.default_difficulty = (
         Hashcash_Message.find_appropriat_difficulty())
